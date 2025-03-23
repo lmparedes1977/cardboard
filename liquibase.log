@@ -1,4 +1,69 @@
-ERROR: Exception Details
-ERROR: Exception Primary Class:  ChangeLogParseException
-ERROR: Exception Primary Reason:  databaseChangeLog does not contain a list of entries. Each changeSet must begin ' - changeSet:'
-ERROR: Exception Primary Source:  4.29.1
+mar. 23, 2025 2:10:12 PM liquibase.database
+INFORMAÇÕES: Set default schema name to public
+mar. 23, 2025 2:10:14 PM liquibase.changelog
+INFORMAÇÕES: Reading resource: db/changelog/migrations/db.changelog-2025032021320.sql
+mar. 23, 2025 2:10:14 PM liquibase.changelog
+INFORMAÇÕES: Reading resource: db/changelog/migrations/db.changelog-20250323131600.sql
+mar. 23, 2025 2:10:14 PM liquibase.changelog
+INFORMAÇÕES: Reading resource: db/changelog/migrations/db.changelog-20250323132600.sql
+mar. 23, 2025 2:10:14 PM liquibase.changelog
+INFORMAÇÕES: Reading resource: db/changelog/migrations/db.changelog-20250323133100.sql
+mar. 23, 2025 2:10:14 PM liquibase.changelog
+INFORMAÇÕES: Creating database history table with name: public.databasechangelog
+mar. 23, 2025 2:10:14 PM liquibase.changelog
+INFORMAÇÕES: Reading from public.databasechangelog
+mar. 23, 2025 2:10:15 PM liquibase.lockservice
+INFORMAÇÕES: Successfully acquired change log lock
+mar. 23, 2025 2:10:15 PM liquibase.command
+INFORMAÇÕES: Using deploymentId: 2749815280
+mar. 23, 2025 2:10:15 PM liquibase.changelog
+INFORMAÇÕES: Reading from public.databasechangelog
+Running Changeset: db/changelog/migrations/db.changelog-2025032021320.sql::2025032021320::leonardo
+mar. 23, 2025 2:10:15 PM liquibase.changelog
+INFORMAÇÕES: Custom SQL executed
+mar. 23, 2025 2:10:15 PM liquibase.changelog
+INFORMAÇÕES: ChangeSet db/changelog/migrations/db.changelog-2025032021320.sql::2025032021320::leonardo ran successfully in 62ms
+Running Changeset: db/changelog/migrations/db.changelog-20250323131600.sql::20250323131600::leonardo
+mar. 23, 2025 2:10:15 PM liquibase.changelog
+INFORMAÇÕES: Custom SQL executed
+mar. 23, 2025 2:10:15 PM liquibase.changelog
+INFORMAÇÕES: ChangeSet db/changelog/migrations/db.changelog-20250323131600.sql::20250323131600::leonardo ran successfully in 36ms
+Running Changeset: db/changelog/migrations/db.changelog-20250323132600.sql::20250323132600::leonardo
+mar. 23, 2025 2:10:15 PM liquibase.changelog
+INFORMAÇÕES: Custom SQL executed
+mar. 23, 2025 2:10:15 PM liquibase.changelog
+INFORMAÇÕES: ChangeSet db/changelog/migrations/db.changelog-20250323132600.sql::20250323132600::leonardo ran successfully in 38ms
+Running Changeset: db/changelog/migrations/db.changelog-20250323133100.sql::20250323133100::leonardo
+mar. 23, 2025 2:10:15 PM liquibase.changelog
+INFORMAÇÕES: Custom SQL executed
+mar. 23, 2025 2:10:15 PM liquibase.changelog
+INFORMAÇÕES: ChangeSet db/changelog/migrations/db.changelog-20250323133100.sql::20250323133100::leonardo ran successfully in 50ms
+
+UPDATE SUMMARY
+Run:                          4
+Previously run:               0
+Filtered out:                 0
+-------------------------------
+Total change sets:            4
+
+mar. 23, 2025 2:10:15 PM liquibase.util
+INFORMAÇÕES: UPDATE SUMMARY
+mar. 23, 2025 2:10:15 PM liquibase.util
+INFORMAÇÕES: Run:                          4
+mar. 23, 2025 2:10:15 PM liquibase.util
+INFORMAÇÕES: Previously run:               0
+mar. 23, 2025 2:10:15 PM liquibase.util
+INFORMAÇÕES: Filtered out:                 0
+mar. 23, 2025 2:10:15 PM liquibase.util
+INFORMAÇÕES: -------------------------------
+mar. 23, 2025 2:10:15 PM liquibase.util
+INFORMAÇÕES: Total change sets:            4
+mar. 23, 2025 2:10:15 PM liquibase.util
+INFORMAÇÕES: Update summary generated
+mar. 23, 2025 2:10:15 PM liquibase.command
+INFORMAÇÕES: Update command completed successfully.
+Liquibase: Update has been successful. Rows affected: 4
+mar. 23, 2025 2:10:15 PM liquibase.lockservice
+INFORMAÇÕES: Successfully released change log lock
+mar. 23, 2025 2:10:15 PM liquibase.command
+INFORMAÇÕES: Command execution complete

@@ -1,46 +1,50 @@
 package com.cardboard.persistence.migration;
 
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.sql.Connection;
+import java.sql.SQLException;
 
-import com.cardboard.persistence.config.SQLiteConnection;
+import com.cardboard.persistence.config.ConnectionConfig;
 
 import liquibase.Liquibase;
 import liquibase.database.jvm.JdbcConnection;
+import liquibase.exception.LiquibaseException;
 import liquibase.resource.ClassLoaderResourceAccessor;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public class MigrationStrategy {
 
+
     private final Connection connection;
 
-    public void executeMigration() {
-        var originalOutput = System.out;
-        var originalError = System.err;        
-
-        try ( var fos = new FileOutputStream("liquibase.log")){
-            System.setOut(new java.io.PrintStream(fos));
-            System.setErr(new java.io.PrintStream(fos));
-            System.setErr(originalError);
-            try(var connection = SQLiteConnection.connect()){
-                var jdbcConnection = new JdbcConnection(connection);
+    public void executeMigration(){
+        var originalOut = System.out;
+        var originalErr = System.err;
+        try(var fos = new FileOutputStream("liquibase.log")){
+            System.setOut(new PrintStream(fos));
+            System.setErr(new PrintStream(fos));
+            try(
+                    var connection = ConnectionConfig.connect();
+                    var jdbcConnection = new JdbcConnection(connection);
+            ){
                 var liquibase = new Liquibase(
-                    "/db/changelog/db.changelog-master.yml",
-                    new ClassLoaderResourceAccessor(),
-                    jdbcConnection);
-                    liquibase.update();
-                    liquibase.close();
-            } catch (Exception e) {
+                        "/db/changelog/db.changelog-master.yml",
+                        new ClassLoaderResourceAccessor(),
+                        jdbcConnection);
+                liquibase.update();
+            } catch (SQLException | LiquibaseException e) {
+                e.printStackTrace();
+                System.setErr(originalErr);
             }
-        } catch (Exception e) {
+        } catch (IOException ex){
+            ex.printStackTrace();
         } finally {
-            System.setOut(originalOutput);
-            System.setErr(originalError);
+            System.setOut(originalOut);
+            System.setErr(originalErr);
         }
-        
-    
-        
     }
 }
 
