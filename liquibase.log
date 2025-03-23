@@ -1,0 +1,4 @@
+ERROR: Exception Details
+ERROR: Exception Primary Class:  ChangeLogParseException
+ERROR: Exception Primary Reason:  databaseChangeLog does not contain a list of entries. Each changeSet must begin ' - changeSet:'
+ERROR: Exception Primary Source:  4.29.1
