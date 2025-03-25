@@ -11,5 +11,5 @@ public class BoardColumnEntity {
     private String name;
     private int column_order;
     private BoardColumnTypeEnum type;
-
+    private BoardEntity board = new BoardEntity();
 }
