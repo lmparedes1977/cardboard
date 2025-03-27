@@ -14,4 +14,8 @@ public class BoardEntity {
     private String name;
     private List<BoardColumnEntity> boardColumns = new ArrayList<>();
 
+    public BoardEntity (String name) {
+        this.name = name;
+    }
+
 }
