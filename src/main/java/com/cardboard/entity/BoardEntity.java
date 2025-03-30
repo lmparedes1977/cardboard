@@ -12,7 +12,7 @@ public class BoardEntity {
 
     private Long id;
     private String name;
-    private List<BoardColumnEntity> boardColumns = new ArrayList<>();
+    private List<BoardColumnEntity> boardsColumns = new ArrayList<>();
 
     public BoardEntity (String name) {
         this.name = name;

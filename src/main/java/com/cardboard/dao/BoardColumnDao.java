@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.cardboard.dto.BoardColumnDto;
 import org.postgresql.jdbc.PgStatement;
 
 import com.cardboard.entity.BoardColumnEntity;
@@ -18,26 +19,29 @@ public class BoardColumnDao {
     private final Connection connection;
 
     public BoardColumnEntity insert(final BoardColumnEntity entity) throws SQLException {
-        var sql = "INSERT INTO board_column (id, name, column_order, type, board_id) VALUES (?, ?, ?, ?, ?)";
-        try(var statement = connection.prepareStatement(sql)) {
+        var sql = "INSERT INTO boards_columns (name, column_order, type, board_id) VALUES (?, ?, ?, ?)";
+        connection.setAutoCommit(false);
+        try(var statement = connection.prepareStatement(sql, PgStatement.RETURN_GENERATED_KEYS)) {
             var i = 1;
-            statement.setLong(i++, entity.getId());
             statement.setString(i++, entity.getName());
             statement.setInt(i++, entity.getColumn_order());
             statement.setString(i++, entity.getType().name());
             statement.setLong(i++, entity.getBoard().getId());
             statement.executeUpdate();
-            if (statement instanceof PgStatement pgStatement) {
-                entity.setId(pgStatement.getLastOID());
-            }
-            return entity;
+            try(var generatedKeys = statement.getGeneratedKeys()) {
+                if(generatedKeys.next()) {
+                    entity.setId(generatedKeys.getLong(1));
+                    System.out.println(entity.getId());
+                }
+            }return entity;
         } catch (SQLException e) {
             throw e;
         }       
     }
 
     public List<BoardColumnEntity> findByBoardId(Long id) throws SQLException {
-        var sql = "SELECT id, name, column_order, type FROM board_column WHERE board_id = ? ORDER BY column_order";
+        var sql = "SELECT id, name, column_order, type FROM boards_columns WHERE board_id = ? ORDER BY column_order";
+        connection.setAutoCommit(false);
         try(var statement = connection.prepareStatement(sql)) {
             statement.setLong(1, id);
             statement.executeQuery();
@@ -52,6 +56,38 @@ public class BoardColumnDao {
                 entities.add(entity);
             }
             return entities;
+        } catch (SQLException e) {
+            throw e;
+        }
+    }
+
+    public List<BoardColumnDto> findByBoardIDetailed(Long id) throws SQLException {
+        var sql = """
+                SELECT
+                    bc.id,
+                    bc.name,
+                    bc.type,
+                    COUNT(SELECT  c.id FROM cards c WHERE c.board_column_id = bc.id) as cards_mount
+                FROM boards_columns bc
+                WHERE board_id = ?
+                ORDER BY bc.column_order
+                """;
+        connection.setAutoCommit(false);
+        try(var statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, id);
+            statement.executeQuery();
+            var resultSet = statement.getResultSet();
+            var columns = new ArrayList<BoardColumnDto>();
+            while (resultSet.next()) {
+                var dto = new BoardColumnDto(
+                        resultSet.getLong("bc.id"),
+                        resultSet.getString("bc.name"),
+                        BoardColumnTypeEnum.valueOf(resultSet.getString("bc.type")),
+                        resultSet.getInt("cards_amount")
+                );
+                columns.add(dto);
+            }
+            return columns;
         } catch (SQLException e) {
             throw e;
         }

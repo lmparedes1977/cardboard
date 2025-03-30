@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import com.cardboard.dao.BoardColumnDao;
 import com.cardboard.dao.BoardDao;
+import com.cardboard.dto.BoardDetailsDto;
 import com.cardboard.entity.BoardEntity;
 
 import lombok.AllArgsConstructor;
@@ -16,13 +17,35 @@ public class BoardQueryService {
     private final Connection connection;
 
     public Optional<BoardEntity> findById(final Long id) throws SQLException {
+        connection.setAutoCommit(false);
         var boardDao = new BoardDao(connection);
         var boardColumnDao = new BoardColumnDao(connection);
         var optional = boardDao.findById(id);
         if (optional.isPresent()) {
             var entity = optional.get();
-            entity.setBoardColumns(boardColumnDao.findByBoardId(entity.getId()));
+            entity.setBoardsColumns(boardColumnDao.findByBoardId(entity.getId()));
+            return Optional.of(entity);
         }
         return Optional.empty();
     }
+
+
+    public Optional<BoardDetailsDto> ShowBoardDetails(final Long id) throws SQLException {
+        connection.setAutoCommit(false);
+        var boardDao = new BoardDao(connection);
+        var boardColumnDao = new BoardColumnDao(connection);
+        var optional = boardDao.findById(id);
+        if (optional.isPresent()) {
+            var entity = optional.get();
+            var columnsDto = boardColumnDao.findByBoardIDetailed(entity.getId());
+            var board = new BoardDetailsDto(
+                    entity.getId(),
+                    entity.getName(),
+                    columnsDto
+            );
+            return Optional.of(board);
+        }
+        return Optional.empty();
+    }
+
 }

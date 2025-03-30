@@ -3,10 +3,11 @@ package com.cardboard.dao;
 import com.cardboard.entity.BoardEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.postgresql.jdbc.PgStatement;
+import org.postgresql.PGStatement;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Optional;
 
 @Data
@@ -17,11 +18,16 @@ public class BoardDao {
 
     public BoardEntity insert(final BoardEntity entity) throws SQLException {
         var sql = "INSERT INTO BOARDS (name) VALUES (?);";
-        try(var statement = connection.prepareStatement(sql)){
+        connection.setAutoCommit(false);
+        try(var statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)){
             statement.setString(1, entity.getName());
             statement.executeUpdate();
-            if (statement instanceof PgStatement pgStatement) {
-                entity.setId(pgStatement.getLastOID());
+
+            try(var generatedKeys = statement.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    entity.setId(generatedKeys.getLong(1));
+                    System.out.println(entity.getId());
+                }
             }
         }
         return entity;
@@ -29,6 +35,7 @@ public class BoardDao {
 
     public void delete(final Long id) throws SQLException {
         var sql = "DELETE FROM BOARDS WHERE id = ?";
+        connection.setAutoCommit(false);
         try(var statement = connection.prepareStatement(sql)){
             statement.setLong(1, id);
             statement.executeUpdate();
@@ -37,6 +44,7 @@ public class BoardDao {
 
     public Optional<BoardEntity> findById(final Long id) throws SQLException {
         var sql = "SELECT id, name FROM BOARDS WHERE id = ?";
+        connection.setAutoCommit(false);
         try(var statement = connection.prepareStatement(sql)){
             statement.setLong(1, id);
             statement.executeQuery();
@@ -53,6 +61,7 @@ public class BoardDao {
 
     public boolean exists(final Long id) throws SQLException {
         var sql = "SELECT 1 FROM BOARDS WHERE id = ?";
+        connection.setAutoCommit(false);
         try(var statement = connection.prepareStatement(sql)){
             statement.setLong(1, id);
             statement.executeQuery();

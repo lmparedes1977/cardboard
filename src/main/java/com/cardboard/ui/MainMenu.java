@@ -8,16 +8,16 @@ import java.util.Scanner;
 import com.cardboard.entity.BoardColumnEntity;
 import com.cardboard.entity.BoardColumnTypeEnum;
 import com.cardboard.entity.BoardEntity;
-import com.cardboard.service.BoardColumnService;
 import com.cardboard.service.BoardQueryService;
 import com.cardboard.service.BoardService;
-import lombok.AllArgsConstructor;
 
 import static com.cardboard.persistence.config.ConnectionConfig.connect;
 
 public class MainMenu {
 
-    private final Scanner scan = new Scanner(System.in);
+    private final Scanner intScan = new Scanner(System.in);
+    private final Scanner stringScan = new Scanner(System.in);
+    private final Scanner longScan = new Scanner(System.in);
 
     public void execute() throws SQLException {
         var option = 0;
@@ -27,7 +27,7 @@ public class MainMenu {
             System.out.println("2. View a board");
             System.out.println("3. Delete a board");
             System.out.println("4. Exit");
-            option = scan.nextInt();
+            option = intScan.nextInt();
             switch (option) {
                 case 1:
                     creatBoard();
@@ -50,38 +50,37 @@ public class MainMenu {
     }
 
     private void creatBoard() {
-        System.out.println("Enter the name of the board:");
-        String name = scan.nextLine();
+        System.out.print("Enter the name of the board: ");
+        String name = stringScan.nextLine();
         var board = new BoardEntity(name);
 
-        System.out.println("You need more than the standard 3 columns in your Board? If you do, enter the total number, if you don't, enter 0 (zero): ");
-        int columnsNumber = scan.nextInt();
-
+        System.out.print("You need more than the standard 3 columns in your Board? If you do, enter the total number, if you don't, enter 0 (zero): ");
+        int columnsNumber = intScan.nextInt();
         List<BoardColumnEntity> boardColumns = new ArrayList();
 
-        System.out.println("Enter the name of initial column: ");
-        String firstColumnName = scan.nextLine();
+        System.out.print("Enter the name of initial column: ");
+        String firstColumnName = stringScan.nextLine();
         var fistColumn = createColumn(firstColumnName, BoardColumnTypeEnum.INITIAL, 0);
         boardColumns.add(fistColumn);
 
-        for(int i = 1; i < columnsNumber; i++) {
-            System.out.println("Enter the name of the next column: ");
-            var pendingColumnName = scan.nextLine();
+        for(int i = 1; i < (columnsNumber == 0 ? 2 : (columnsNumber-1)); i++) {
+            System.out.print("Enter the name of the next column: ");
+            var pendingColumnName = stringScan.nextLine();
             var pendingColumn = createColumn(pendingColumnName, BoardColumnTypeEnum.PENDING, i);
             boardColumns.add(pendingColumn);
         }
 
-        System.out.println("Enter the name of final column: ");
-        String lastColumnName = scan.nextLine();
-        var lastColumn = createColumn(lastColumnName, BoardColumnTypeEnum.FINAL, columnsNumber);
+        System.out.print("Enter the name of final column: ");
+        String lastColumnName = stringScan.nextLine();
+        var lastColumn = createColumn(lastColumnName, BoardColumnTypeEnum.FINAL, (columnsNumber == 0 ? 2 : (columnsNumber-1)) );
         boardColumns.add(lastColumn);
 
-        System.out.println("Enter the name of final column: ");
-        String cancelColumnName = scan.nextLine();
-        var cancelColumn = createColumn(cancelColumnName, BoardColumnTypeEnum.CANCEL, columnsNumber);
+        System.out.print("Enter the name of canceling column: ");
+        String cancelColumnName = stringScan.nextLine();
+        var cancelColumn = createColumn(cancelColumnName, BoardColumnTypeEnum.CANCEL, (columnsNumber == 0 ? 3 : (columnsNumber)) ) ;
         boardColumns.add(cancelColumn);
 
-        board.setBoardColumns(boardColumns);
+        board.setBoardsColumns(boardColumns);
 
         try(var connection = connect()) {
             var service = new BoardService(connection);
@@ -94,19 +93,20 @@ public class MainMenu {
 
     private void selectBoard() throws SQLException {
         System.out.println("Enter the id of the board:");
-        var id = scan.nextLong();
+        var id = longScan.nextLong();
         try(var connection = connect()) {
             var service = new BoardQueryService(connection);
             var optional = service.findById(id);
             optional.ifPresentOrElse(
                     b -> new BoardMenu(b).execute(),
-                    () ->  System.out.printf("Board with id %s not found.", id));
+                    () ->  System.out.printf("Board with id %s not found.", id)
+            );
         }
     }
 
     private void deleteBoard() {
         System.out.println("Enter the id of the board:");
-        var id = scan.nextLong();
+        var id = longScan.nextLong();
         try(var connection = connect()) {
             var service = new BoardService(connection);
             if (service.delete(id)) {
