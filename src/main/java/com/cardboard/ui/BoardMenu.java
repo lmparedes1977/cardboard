@@ -1,7 +1,9 @@
 package com.cardboard.ui;
 
 import com.cardboard.dto.BoardDetailsDto;
+import com.cardboard.entity.BoardColumnEntity;
 import com.cardboard.entity.BoardEntity;
+import com.cardboard.service.BoardColumnQueryService;
 import com.cardboard.service.BoardQueryService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -51,7 +53,8 @@ public class BoardMenu {
                 }
             } while (option != 9);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            System.exit(1);
         }
     }
 
@@ -74,20 +77,38 @@ public class BoardMenu {
         try(var connection = connect()) {
             var optional = new BoardQueryService(connection).ShowBoardDetails(entity.getId());
             optional.ifPresent(b -> {
-                        System.out.printf("Board %d - %s", b.id(), b.name());
+                        System.out.printf("******* Board %d - %s ********\n", b.id(), b.name());
                         b.columns().forEach(c -> {
-                            System.out.printf("Column: %s - type: %s - has: %d cards. ", c.name(), c.type().name(), c.quantity());
+                            System.out.printf("Column: %s - type: %s - %d cards.\n", c.name(), c.type().name(), c.quantity());
                         });
                     });
-            }
         }
     }
 
-    private void showColumn() {
+    private void showColumn() throws SQLException {
+        System.out.printf("Pick a Column form board %s\n", entity.getName());
+        var columnsIds = entity.getBoardsColumns().stream().map(BoardColumnEntity::getId).toList();
+        var selectedColumn = -1L;
+        while(!columnsIds.contains(selectedColumn)){
+            entity.getBoardsColumns().forEach(c -> {
+                System.out.printf("%d - %s [%s]\n", c.getId(), c.getName(),c.getType().name());
+            });
+            selectedColumn = longScan.nextLong();
+        }
+        try(var connection = connect()) {
+            var column = new BoardColumnQueryService(connection).findById(selectedColumn);
+            column.ifPresent(co -> {
+                System.out.printf("Column %s type %s\n", co.getName(), co.getType().name());
+                co.getCards().forEach(ca -> {
+                    System.out.printf("Card %s - %s\nDescription: %s", ca.getId(), ca.getTitle(), ca.getDescription());
+                });
+            });
+        }
     }
 
     private void showCard() {
     }
-
-
 }
+
+
+

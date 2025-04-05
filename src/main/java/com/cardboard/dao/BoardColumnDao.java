@@ -4,8 +4,10 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import com.cardboard.dto.BoardColumnDto;
+import com.cardboard.entity.CardEntity;
 import org.postgresql.jdbc.PgStatement;
 
 import com.cardboard.entity.BoardColumnEntity;
@@ -67,7 +69,7 @@ public class BoardColumnDao {
                     bc.id,
                     bc.name,
                     bc.type,
-                    COUNT(SELECT  c.id FROM cards c WHERE c.board_column_id = bc.id) as cards_mount
+                    COUNT(SELECT c.id FROM cards c WHERE c.board_column_id = bc.id) as cards_amount
                 FROM boards_columns bc
                 WHERE board_id = ?
                 ORDER BY bc.column_order
@@ -88,6 +90,43 @@ public class BoardColumnDao {
                 columns.add(dto);
             }
             return columns;
+        } catch (SQLException e) {
+            throw e;
+        }
+    }
+
+    public Optional<BoardColumnEntity> findById(Long id) throws SQLException {
+        var sql = """
+                SELECT bc.name,
+                       bc.type,
+                       c.id,
+                       c.title,
+                       c.description
+                       FROM boards_columns bc
+                       INNER JOIN cards c
+                       ON c.board_column_id = bc.id
+                       WHERE bc.id = ?
+                """;
+        connection.setAutoCommit(false);
+        try(var statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, id);
+            statement.executeQuery();
+            var resultSet = statement.getResultSet();
+            var entity = new BoardColumnEntity();
+            if(resultSet.next()) {
+                entity.setName(resultSet.getString("bc.name"));
+                entity.setType(BoardColumnTypeEnum.valueOf(resultSet.getString("bc.type")));
+            }
+            var cardEntities = new ArrayList<CardEntity>();
+            while (resultSet.next()) {
+                var cardEntity = new CardEntity();
+                cardEntity.setId(resultSet.getLong("c.id"));
+                cardEntity.setTitle(resultSet.getString("c.title"));
+                cardEntity.setDescription(resultSet.getString("c.description"));
+                cardEntities.add(cardEntity);
+            }
+            entity.setCards(cardEntities);
+            return Optional.of(entity);
         } catch (SQLException e) {
             throw e;
         }
