@@ -1,4 +1,4 @@
-package com.cardboard.entity;
+package com.cardboard.persistence.entity;
 
 import java.util.ArrayList;
 import java.util.List;

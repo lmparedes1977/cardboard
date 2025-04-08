@@ -1,9 +1,8 @@
-package com.cardboard.dao;
+package com.cardboard.persistence.dao;
 
-import com.cardboard.entity.BoardEntity;
+import com.cardboard.persistence.entity.BoardEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.postgresql.PGStatement;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -22,11 +21,9 @@ public class BoardDao {
         try(var statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)){
             statement.setString(1, entity.getName());
             statement.executeUpdate();
-
             try(var generatedKeys = statement.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     entity.setId(generatedKeys.getLong(1));
-                    System.out.println(entity.getId());
                 }
             }
         }

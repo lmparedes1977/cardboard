@@ -4,10 +4,10 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Optional;
 
-import com.cardboard.dao.BoardColumnDao;
-import com.cardboard.dao.BoardDao;
+import com.cardboard.persistence.dao.BoardColumnDao;
+import com.cardboard.persistence.dao.BoardDao;
 import com.cardboard.dto.BoardDetailsDto;
-import com.cardboard.entity.BoardEntity;
+import com.cardboard.persistence.entity.BoardEntity;
 
 import lombok.AllArgsConstructor;
 

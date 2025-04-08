@@ -1,10 +1,10 @@
 package com.cardboard.ui;
 
-import com.cardboard.dto.BoardDetailsDto;
-import com.cardboard.entity.BoardColumnEntity;
-import com.cardboard.entity.BoardEntity;
+import com.cardboard.persistence.entity.BoardColumnEntity;
+import com.cardboard.persistence.entity.BoardEntity;
 import com.cardboard.service.BoardColumnQueryService;
 import com.cardboard.service.BoardQueryService;
+import com.cardboard.service.CardQueryService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -106,7 +106,20 @@ public class BoardMenu {
         }
     }
 
-    private void showCard() {
+    private void showCard() throws SQLException {
+        System.out.print("Enter the card id you wish to visualize: ");
+        var selectedCardId = longScan.nextLong();
+        try (var connection = connect()) {
+            new CardQueryService(connection)
+                    .findById(selectedCardId)
+                    .ifPresentOrElse(c -> {
+                        System.out.printf("Card %s - %s\nDescription: %s\n", c.id(), c.title(), c.description());
+                        System.out.printf(c.blocked() ? "Blocked for reason %s\n" : "Not Blocked\n", c.blockReason());
+                        System.out.printf("Blocked %s times\n", c.blocsAmount());
+                        System.out.printf("Presently belongs to Column %s - %s",c.columnId(), c.columnName());
+                    },
+                        () -> System.out.printf("Card with id %d dows not exist.\n", selectedCardId));
+        }
     }
 }
 

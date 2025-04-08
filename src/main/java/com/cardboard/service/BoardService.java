@@ -1,8 +1,8 @@
 package com.cardboard.service;
 
-import com.cardboard.dao.BoardDao;
-import com.cardboard.entity.BoardColumnEntity;
-import com.cardboard.entity.BoardEntity;
+import com.cardboard.persistence.dao.BoardDao;
+import com.cardboard.persistence.entity.BoardColumnEntity;
+import com.cardboard.persistence.entity.BoardEntity;
 
 import lombok.AllArgsConstructor;
 

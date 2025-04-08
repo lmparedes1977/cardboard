@@ -1,4 +1,4 @@
-package com.cardboard.dao;
+package com.cardboard.persistence.dao;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -7,13 +7,15 @@ import java.util.List;
 import java.util.Optional;
 
 import com.cardboard.dto.BoardColumnDto;
-import com.cardboard.entity.CardEntity;
+import com.cardboard.persistence.entity.CardEntity;
 import org.postgresql.jdbc.PgStatement;
 
-import com.cardboard.entity.BoardColumnEntity;
-import com.cardboard.entity.BoardColumnTypeEnum;
+import com.cardboard.persistence.entity.BoardColumnEntity;
+import com.cardboard.persistence.entity.BoardColumnTypeEnum;
 
 import lombok.AllArgsConstructor;
+
+import static java.util.Objects.isNull;
 
 @AllArgsConstructor
 public class BoardColumnDao {
@@ -69,10 +71,10 @@ public class BoardColumnDao {
                     bc.id,
                     bc.name,
                     bc.type,
-                    COUNT(SELECT c.id FROM cards c WHERE c.board_column_id = bc.id) as cards_amount
+                    (SELECT count(c.id) FROM cards c WHERE c.board_column_id = bc.id) as cards_amount
                 FROM boards_columns bc
                 WHERE board_id = ?
-                ORDER BY bc.column_order
+                ORDER BY bc.column_order;
                 """;
         connection.setAutoCommit(false);
         try(var statement = connection.prepareStatement(sql)) {
@@ -103,9 +105,9 @@ public class BoardColumnDao {
                        c.title,
                        c.description
                        FROM boards_columns bc
-                       INNER JOIN cards c
+                       LEFT JOIN cards c
                        ON c.board_column_id = bc.id
-                       WHERE bc.id = ?
+                       WHERE bc.id = ?;
                 """;
         connection.setAutoCommit(false);
         try(var statement = connection.prepareStatement(sql)) {
@@ -116,19 +118,21 @@ public class BoardColumnDao {
             if(resultSet.next()) {
                 entity.setName(resultSet.getString("bc.name"));
                 entity.setType(BoardColumnTypeEnum.valueOf(resultSet.getString("bc.type")));
+                var cardEntities = new ArrayList<CardEntity>();
+                while (resultSet.next()) {
+                    if (isNull(resultSet.getString("c.title"))) {
+                        break;
+                    }
+                    var cardEntity = new CardEntity();
+                    cardEntity.setId(resultSet.getLong("c.id"));
+                    cardEntity.setTitle(resultSet.getString("c.title"));
+                    cardEntity.setDescription(resultSet.getString("c.description"));
+                    cardEntities.add(cardEntity);
+                }
+                entity.setCards(cardEntities);
+                return Optional.of(entity);
             }
-            var cardEntities = new ArrayList<CardEntity>();
-            while (resultSet.next()) {
-                var cardEntity = new CardEntity();
-                cardEntity.setId(resultSet.getLong("c.id"));
-                cardEntity.setTitle(resultSet.getString("c.title"));
-                cardEntity.setDescription(resultSet.getString("c.description"));
-                cardEntities.add(cardEntity);
-            }
-            entity.setCards(cardEntities);
-            return Optional.of(entity);
-        } catch (SQLException e) {
-            throw e;
+            return Optional.empty();
         }
     }
 

@@ -1,6 +1,6 @@
 package com.cardboard.dto;
 
-import com.cardboard.entity.BoardColumnTypeEnum;
+import com.cardboard.persistence.entity.BoardColumnTypeEnum;
 
 public record BoardColumnDto(
         Long id,

@@ -1,7 +1,7 @@
 package com.cardboard.service;
 
-import com.cardboard.dao.BoardColumnDao;
-import com.cardboard.entity.BoardColumnEntity;
+import com.cardboard.persistence.dao.BoardColumnDao;
+import com.cardboard.persistence.entity.BoardColumnEntity;
 import lombok.AllArgsConstructor;
 
 import java.sql.Connection;

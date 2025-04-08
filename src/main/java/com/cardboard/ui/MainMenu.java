@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-import com.cardboard.entity.BoardColumnEntity;
-import com.cardboard.entity.BoardColumnTypeEnum;
-import com.cardboard.entity.BoardEntity;
+import com.cardboard.persistence.entity.BoardColumnEntity;
+import com.cardboard.persistence.entity.BoardColumnTypeEnum;
+import com.cardboard.persistence.entity.BoardEntity;
 import com.cardboard.service.BoardQueryService;
 import com.cardboard.service.BoardService;
 
